@@ -12,6 +12,8 @@ int main(int argc, char** argv){
     MPI_Comm_size(MPI_COMM_WORLD, &size);
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     
+    printf("Size %d and Rank %d initialized !\n", size, rank);
+
     int sum = 0;
 
     int buffer[size];
@@ -21,17 +23,21 @@ int main(int argc, char** argv){
         if (i != rank){
             sum += i;
         }
+    }
+    buffer[rank] = sum;
 
-        buffer[rank] = sum;
+    // Every rank broadcast his result
+    for (int i = 0; i < size; i++){
+        int ret = sum;
+        if (i == rank) MPI_Bcast(&sum, size, MPI_INT, i, MPI_COMM_WORLD);
+        else MPI_Bcast(&ret, size, MPI_INT, i, MPI_COMM_WORLD);
+        
+        buffer[i] = ret;
     }
 
-    for (int i = 0; i < size; i++){
-        int ret;
-
-        if (i != rank){
-            MPI_Sendrecv(&sum, 1, MPI_INT, i, rank, &ret, 1, MPI_INT, i, i, MPI_COMM_WORLD, &status);
-
-            buffer[i] = ret;
+    if (rank == 0){
+        for (int i = 0; i < size; i++){
+            printf("%d\n", buffer[i]);
         }
     }
 

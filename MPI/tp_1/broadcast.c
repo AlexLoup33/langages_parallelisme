@@ -21,12 +21,10 @@ int main(int argc, char** argv){
         for (int i; i < buffer_size; i++){
             buffer[i] = i;
         }
-        
-        for (int j = 1; j < size; j++){
-            MPI_Send(&buffer, buffer_size, MPI_INT, j, 0, MPI_COMM_WORLD);
-        }
+
+        MPI_Bcast(&buffer, buffer_size, MPI_INT, rank, MPI_COMM_WORLD);
     } else {
-        MPI_Recv(&buffer, buffer_size, MPI_INT, 0, 0, MPI_COMM_WORLD, &status);
+        MPI_Bcast(&buffer, buffer_size, MPI_INT, 0, MPI_COMM_WORLD);
 
         printf("Rank %d received the buffer\nDisplay tab received :\n", rank);
         for (int i = 0; i < buffer_size; i++){
