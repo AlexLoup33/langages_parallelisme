@@ -7,7 +7,8 @@ int main(int argc, char** argv){
     
     MPI_Init(&argc, &argv);
 
-    int rank, size;
+    int rank;
+    int size;
 
     MPI_Comm_size(MPI_COMM_WORLD, &size);
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
@@ -29,15 +30,16 @@ int main(int argc, char** argv){
     // Every rank broadcast his result
     for (int i = 0; i < size; i++){
         int ret = sum;
-        if (i == rank) MPI_Bcast(&sum, size, MPI_INT, i, MPI_COMM_WORLD);
-        else MPI_Bcast(&ret, size, MPI_INT, i, MPI_COMM_WORLD);
-        
+        if (i == rank) MPI_Bcast(&sum, 1, MPI_INT, i, MPI_COMM_WORLD);
+        else MPI_Bcast(&ret, 1, MPI_INT, i, MPI_COMM_WORLD);
+
         buffer[i] = ret;
     }
+    printf("Rank %d had finished to process !\n", rank);
 
     if (rank == 0){
         for (int i = 0; i < size; i++){
-            printf("%d\n", buffer[i]);
+            printf("tab[%d] = %d\n", i, buffer[i]);
         }
     }
 
